@@ -96,3 +96,39 @@ Security
 
 Responsive
 - [ ] At ~375px wide there's no horizontal scrolling, and actions wrap under the habit name.
+
+## 7. Slaptažodžio atkūrimas (Supabase Auth)
+
+Prisijungimo lange nuoroda „Forgot password?“ atidaro /forgot-password.
+Laiškas siunčiamas su resetPasswordForEmail(), o /reset-password puslapyje
+slaptažodis pakeičiamas su updateUser(). Grįžimo URL sudaromas iš
+window.location.origin, todėl naudojamas tas domenas ir prievadas, kuriame paprašyta nuorodos.
+Naujas slaptažodis turi būti bent 8 simbolių; griežtesnius reikalavimus tikrina Supabase.
+
+Supabase Dashboard → Authentication → URL Configuration:
+
+1. Site URL nustatykite į pagrindinį produkcinį adresą, pvz. https://jusu-projektas.vercel.app.
+2. Į Redirect URLs įtraukite:
+   - http://localhost:5173/reset-password
+   - https://jusu-projektas.vercel.app/reset-password
+   - Jei naudojate kitą vietinį prievadą, npm run preview (paprastai 4173),
+     127.0.0.1, nuosavą domeną arba Vercel Preview, pridėkite ir tikslų jo /reset-password adresą.
+3. Authentication → Email Templates → Reset Password palikite patvirtinimo
+   nuorodą su {{ .ConfirmationURL }} (standartinis Supabase šablonas).
+   Paprastos nuorodos į Site URL neužtenka: reikalingas Supabase tokeno patvirtinimas.
+
+Vercel turi būti nustatyti VITE_SUPABASE_URL ir VITE_SUPABASE_ANON_KEY aplinkos
+kintamieji. Po pakeitimų atlikite naują diegimą. vercel.json užtikrina SPA
+maršrutų atidarymą tiesiogiai, įskaitant /reset-password.
+
+Patikra po Dashboard konfigūracijos:
+
+- Paprašykite atkūrimo laiško lokaliai ir atskirai Vercel.
+- Atidarykite naujausią laiško nuorodą; ji turi grąžinti į atitinkamo domeno /reset-password.
+- Patikrinkite trumpą slaptažodį ir nesutampantį pakartojimą.
+- Pakeiskite slaptažodį, atsijunkite ir prisijunkite nauju slaptažodžiu.
+- Patikrinkite pasibaigusią / jau panaudotą nuorodą atsijungus ir tiesioginį
+  /reset-password atidarymą be sesijos: turi būti pasiūlyta gauti naują nuorodą.
+- Perkraukite /reset-password Vercel aplinkoje: neturi būti 404.
+
+Dokumentacija: https://supabase.com/docs/guides/auth/redirect-urls
